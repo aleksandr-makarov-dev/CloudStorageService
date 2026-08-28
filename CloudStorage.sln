@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9720E45D-1464-495E-80BF-07978145A542}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4AC68BB6-6AA7-411F-9008-D50FBD1237AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudStorage", "src\CloudStorage\CloudStorage.csproj", "{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudStorage.Tests", "tests\CloudStorage.Tests\CloudStorage.Tests.csproj", "{01C90F8A-D4DF-4558-98F3-5F752EA834B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C3B24BB1-68FF-4B37-AB5F-93F112DAD123}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF} = {9720E45D-1464-495E-80BF-07978145A542}
+		{01C90F8A-D4DF-4558-98F3-5F752EA834B5} = {4AC68BB6-6AA7-411F-9008-D50FBD1237AB}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A02AE3-BE90-4195-8BFD-1C1EBC5123EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01C90F8A-D4DF-4558-98F3-5F752EA834B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01C90F8A-D4DF-4558-98F3-5F752EA834B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01C90F8A-D4DF-4558-98F3-5F752EA834B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01C90F8A-D4DF-4558-98F3-5F752EA834B5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
