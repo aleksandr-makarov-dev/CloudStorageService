@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using CloudStorage.Extensions;
-using CloudStorage.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +15,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddValidation();
 
 // Api
+builder.Services.AddCors(builder.Configuration);
 builder.Services.AddApiVersioning(options =>
     {
         options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -43,7 +43,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 

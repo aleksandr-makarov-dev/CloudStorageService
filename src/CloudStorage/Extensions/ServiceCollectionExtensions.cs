@@ -22,6 +22,10 @@ public static class ServiceCollectionExtensions
             .AddOptions<StorageOptions>()
             .Bind(configuration.GetSection(StorageOptions.SectionName))
             .ValidateOnStart();
+
+        services.AddOptions<CorsOptions>()
+            .Bind(configuration.GetSection(CorsOptions.SectionName))
+            .ValidateOnStart();
     }
 
     public static void AddPersistence(this IServiceCollection services,
@@ -59,5 +63,30 @@ public static class ServiceCollectionExtensions
     {
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
+    }
+
+    public static void AddCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var corsOptions = configuration
+            .GetSection(CorsOptions.SectionName)
+            .Get<CorsOptions>();
+
+        ArgumentNullException.ThrowIfNull(corsOptions);
+
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder =>
+            {
+                builder
+                    .WithOrigins(corsOptions.AllowedOrigins)
+                    .WithHeaders(corsOptions.AllowedHeaders)
+                    .WithMethods(corsOptions.AllowedMethods);
+
+                if (corsOptions.AllowCredentials)
+                {
+                    builder.AllowCredentials();
+                }
+            });
+        });
     }
 }
