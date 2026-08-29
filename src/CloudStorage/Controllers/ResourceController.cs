@@ -1,0 +1,12 @@
+﻿using Asp.Versioning;
+using CloudStorage.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CloudStorage.Controllers;
+
+[ApiController]
+[ApiVersion(1.0)]
+[Route("api/{version:apiVersion}/resources")]
+public class ResourceController(IResourceService resourceService) : ControllerBase
+{
+}
