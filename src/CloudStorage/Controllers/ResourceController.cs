@@ -18,4 +18,12 @@ public class ResourceController(IResourceService resourceService) : ControllerBa
 
         return Ok(result);
     }
+
+    [HttpPut("{id:guid}/complete-upload")]
+    public async Task<IActionResult> CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await resourceService.CompleteUploadAsync(id, cancellationToken);
+
+        return NoContent();
+    }
 }

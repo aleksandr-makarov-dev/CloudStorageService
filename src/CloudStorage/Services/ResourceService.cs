@@ -1,4 +1,5 @@
 ﻿using CloudStorage.Domain;
+using CloudStorage.Extensions;
 using CloudStorage.Models;
 using CloudStorage.Options;
 using CloudStorage.Persistence;
@@ -30,10 +31,12 @@ internal sealed class ResourceService(
 
         var expiresAtUtc = utcNow.AddMinutes(_storageOptions.UploadUrlTtlMinutes);
 
+        var maxContentLength = request.ContentLength + 5 * 1024 * 1024;
+
         var policy = new PostPolicy();
         policy.SetKey(resourceKey);
         policy.SetContentType(request.ContentType);
-        policy.SetContentLength(request.ContentLength);
+        policy.SetContentRange(1, maxContentLength);
         policy.SetBucket(_minioOptions.BucketName);
         policy.SetExpires(expiresAtUtc);
 
@@ -66,5 +69,22 @@ internal sealed class ResourceService(
             ExpiresAtUtc = expiresAtUtc,
             FormFields = formFields.ToDictionary()
         };
+    }
+
+    public async Task CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var resource = await dbContext.Resources.FindByIdAsync(id, cancellationToken);
+
+        if (resource is null)
+        {
+            throw new Exception("Resource not found.");
+        }
+        
+        // TODO: check if file is fully uploaded.
+
+        resource.IsUploaded = true;
+        resource.UploadedAtUtc = DateTime.UtcNow;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }
