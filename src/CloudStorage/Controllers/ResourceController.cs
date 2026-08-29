@@ -7,7 +7,7 @@ namespace CloudStorage.Controllers;
 
 [ApiController]
 [ApiVersion(1.0)]
-[Route("api/{version:apiVersion}/resources")]
+[Route("api/v{version:apiVersion}/resources")]
 public class ResourceController(IResourceService resourceService) : ControllerBase
 {
     [HttpPost("upload-url")]

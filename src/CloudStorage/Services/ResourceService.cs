@@ -40,6 +40,7 @@ internal sealed class ResourceService(
         var presignedPostPolicyArgs = new PresignedPostPolicyArgs()
             .WithBucket(_minioOptions.BucketName)
             .WithExpiration(expiresAtUtc)
+            .WithObject(resourceKey)
             .WithPolicy(policy);
 
         var (uri, formFields) = await minioClient.PresignedPostPolicyAsync(presignedPostPolicyArgs);
