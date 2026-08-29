@@ -1,16 +1,21 @@
-using System.Reflection;
 using Asp.Versioning;
 using CloudStorage.Extensions;
-using FluentValidation;
+using CloudStorage.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configuration
+builder.Services.AddOptions(builder.Configuration);
+
+// Infrastructure
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddMinioStorage(builder.Configuration);
-builder.Services.AddServices();
+
+// Application
+builder.Services.AddApplicationServices();
 builder.Services.AddValidation();
 
+// Api
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
