@@ -31,12 +31,10 @@ internal sealed class ResourceService(
 
         var expiresAtUtc = utcNow.AddMinutes(_storageOptions.UploadUrlTtlMinutes);
 
-        var maxContentLength = request.ContentLength + 5 * 1024 * 1024;
-
         var policy = new PostPolicy();
         policy.SetKey(resourceKey);
         policy.SetContentType(request.ContentType);
-        policy.SetContentRange(1, maxContentLength);
+        policy.SetContentRange(1, request.ContentLength);
         policy.SetBucket(_minioOptions.BucketName);
         policy.SetExpires(expiresAtUtc);
 
