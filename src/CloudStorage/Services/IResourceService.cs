@@ -8,4 +8,7 @@ public interface IResourceService
         CancellationToken cancellationToken = default);
 
     Task CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ResourceResponse>> ListAsync(ListResourcesQueryParams query,
+        CancellationToken cancellationToken = default);
 }

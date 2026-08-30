@@ -1,8 +1,10 @@
 ﻿using CloudStorage.Domain;
 using CloudStorage.Extensions;
+using CloudStorage.Mapping;
 using CloudStorage.Models;
 using CloudStorage.Options;
 using CloudStorage.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel;
@@ -77,12 +79,27 @@ internal sealed class ResourceService(
         {
             throw new Exception("Resource not found.");
         }
-        
+
         // TODO: check if file is fully uploaded.
 
+        var utcNow = DateTime.UtcNow;
+
         resource.IsUploaded = true;
-        resource.UploadedAtUtc = DateTime.UtcNow;
-        
+        resource.UploadedAtUtc = utcNow;
+        resource.LastModifiedAtUtc = utcNow;
+
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<ResourceResponse>> ListAsync(ListResourcesQueryParams query,
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Resources
+            .AsNoTracking()
+            // TODO: replace with global filter for soft delete
+            .Where(x => x.IsUploaded && !x.IsDeleted)
+            .OrderByDescending(x => x.CreatedAtUtc)
+            .Select(ResourceProjections.ToResourceResponse)
+            .ToListAsync(cancellationToken);
     }
 }

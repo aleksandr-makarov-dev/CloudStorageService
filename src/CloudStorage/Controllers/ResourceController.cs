@@ -20,10 +20,19 @@ public class ResourceController(IResourceService resourceService) : ControllerBa
     }
 
     [HttpPut("{id:guid}/complete-upload")]
-    public async Task<IActionResult> CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CompleteUpload(Guid id, CancellationToken cancellationToken = default)
     {
         await resourceService.CompleteUploadAsync(id, cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> List([FromQuery] ListResourcesQueryParams query,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await resourceService.ListAsync(query, cancellationToken);
+        
+        return Ok(result);
     }
 }
