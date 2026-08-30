@@ -1,4 +1,5 @@
 ﻿using CloudStorage.Domain;
+using CloudStorage.Exceptions;
 using CloudStorage.Extensions;
 using CloudStorage.Mapping;
 using CloudStorage.Models;
@@ -71,13 +72,13 @@ internal sealed class ResourceService(
         };
     }
 
-    public async Task CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ResourceResponse> CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var resource = await dbContext.Resources.FindByIdAsync(id, cancellationToken);
 
         if (resource is null)
         {
-            throw new Exception("Resource not found.");
+            throw new NotFoundException($"Resource '{id}' not found.");
         }
 
         // TODO: check if file is fully uploaded.
@@ -89,6 +90,8 @@ internal sealed class ResourceService(
         resource.LastModifiedAtUtc = utcNow;
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        return resource.ToResourceResponse();
     }
 
     public async Task<IReadOnlyList<ResourceResponse>> ListAsync(ListResourcesQueryParams query,
@@ -101,5 +104,25 @@ internal sealed class ResourceService(
             .OrderByDescending(x => x.CreatedAtUtc)
             .Select(ResourceProjections.ToResourceResponse)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ResourceResponse> UpdateAsync(Guid id, UpdateResourceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var resource = await dbContext.Resources.FindByIdAsync(id, cancellationToken);
+
+        if (resource is null)
+        {
+            throw new NotFoundException($"Resource '{id}' not found.");
+        }
+
+        // TODO: check if resource with the same name exists.
+
+        resource.Name = request.Name;
+        resource.LastModifiedAtUtc = DateTime.UtcNow;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return resource.ToResourceResponse();
     }
 }

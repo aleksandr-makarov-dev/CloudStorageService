@@ -28,10 +28,19 @@ public class ResourceController(IResourceService resourceService) : ControllerBa
     }
 
     [HttpGet]
-    public async Task<IActionResult> List([FromQuery] ListResourcesQueryParams query,
+    public async Task<IActionResult> ListResources([FromQuery] ListResourcesQueryParams query,
         CancellationToken cancellationToken = default)
     {
         var result = await resourceService.ListAsync(query, cancellationToken);
+        
+        return Ok(result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateResource(Guid id, [FromBody] UpdateResourceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await resourceService.UpdateAsync(id, request, cancellationToken);
         
         return Ok(result);
     }
