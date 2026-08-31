@@ -1,4 +1,7 @@
-﻿namespace CloudStorage.Exceptions;
+﻿using System.Net;
 
-public class NotFoundException(string? message = null, Exception? innerException = null)
-    : Exception(message, innerException);
+namespace CloudStorage.Exceptions;
+
+public sealed class NotFoundException(string resourceName, object resourceId, Exception? innerException = null)
+    : ApplicationException($"{resourceName} with id '{resourceId}' was not found.",
+        innerException, HttpStatusCode.NotFound);

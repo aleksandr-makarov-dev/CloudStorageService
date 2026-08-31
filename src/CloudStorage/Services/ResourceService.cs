@@ -17,7 +17,8 @@ internal sealed class ResourceService(
     ApplicationDbContext dbContext,
     IMinioClient minioClient,
     IOptions<MinioOptions> minioOptions,
-    IOptions<StorageOptions> storageOptions) : IResourceService
+    IOptions<StorageOptions> storageOptions,
+    ILogger<ResourceService> logger) : IResourceService
 {
     private readonly MinioOptions _minioOptions = minioOptions.Value;
     private readonly StorageOptions _storageOptions = storageOptions.Value;
@@ -78,7 +79,7 @@ internal sealed class ResourceService(
 
         if (resource is null)
         {
-            throw new NotFoundException($"Resource '{id}' not found.");
+            throw new NotFoundException(nameof(Resource), id);
         }
 
         // TODO: check if file is fully uploaded.
@@ -113,7 +114,7 @@ internal sealed class ResourceService(
 
         if (resource is null)
         {
-            throw new NotFoundException($"Resource '{id}' not found.");
+            throw new NotFoundException(nameof(Resource), id);
         }
 
         // TODO: check if resource with the same name exists.
