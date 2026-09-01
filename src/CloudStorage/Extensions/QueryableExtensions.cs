@@ -10,4 +10,10 @@ public static class QueryableExtensions
     {
         return queryable.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
+
+    public static Task<bool> FolderExistsByIdAsync(this IQueryable<Resource> queryable, Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return queryable.AnyAsync(x => x.Id == id && x.IsFolder, cancellationToken);
+    }
 }

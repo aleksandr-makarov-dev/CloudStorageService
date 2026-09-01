@@ -28,6 +28,14 @@ internal sealed class ResourceService(
     {
         // TODO: check quota
 
+        if (request.ParentId.HasValue &&
+            !await dbContext.Resources.FolderExistsByIdAsync(request.ParentId.Value, cancellationToken))
+        {
+            logger.LogWarning("Parent folder {ParentFolderId} was not found.", request.ParentId.Value);
+
+            throw new ConflictException($"Parent folder with id '{request.ParentId.Value}' does not exist.");
+        }
+
         var utcNow = DateTime.UtcNow;
 
         var resourceId = Guid.NewGuid();
@@ -58,6 +66,7 @@ internal sealed class ResourceService(
             ContentType = request.ContentType,
             ContentLength = request.ContentLength,
             IsFolder = false,
+            ParentId = request.ParentId,
             CreatedAtUtc = utcNow,
         };
 
@@ -159,7 +168,7 @@ internal sealed class ResourceService(
         return await dbContext.Resources
             .AsNoTracking()
             // TODO: replace with global filter for soft delete
-            .Where(x => (x.IsFolder || x.IsUploaded) && !x.IsDeleted)
+            .Where(x => (x.IsFolder || x.IsUploaded) && !x.IsDeleted && x.ParentId == query.ParentId)
             .OrderByDescending(x => x.CreatedAtUtc)
             .Select(ResourceProjections.ToResourceResponse)
             .ToListAsync(cancellationToken);
@@ -188,10 +197,20 @@ internal sealed class ResourceService(
     public async Task<ResourceResponse> CreateFolderAsync(CreateFolderRequest request,
         CancellationToken cancellationToken = default)
     {
+        if (request.ParentId.HasValue &&
+            !await dbContext.Resources.FolderExistsByIdAsync(request.ParentId.Value, cancellationToken))
+        {
+            logger.LogWarning("Parent folder {ParentFolderId} was not found.", request.ParentId.Value);
+
+            throw new ConflictException($"Parent folder with id '{request.ParentId.Value}' does not exist.");
+        }
+
+
         var resource = new Resource
         {
             Name = request.Name,
             IsFolder = true,
+            ParentId = request.ParentId,
             CreatedAtUtc = DateTime.UtcNow
         };
 
