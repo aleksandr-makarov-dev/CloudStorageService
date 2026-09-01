@@ -18,7 +18,14 @@ public sealed class GlobalExceptionHandler(
             "Unhandled exception occurred. TraceId: {TraceId}",
             httpContext.TraceIdentifier);
 
-        var (statusCode, title) = MapException(exception);
+        var statusCode = StatusCodes.Status500InternalServerError;
+        var detail = "An internal server error occurred.";
+
+        if (exception is Exceptions.ApplicationException applicationException)
+        {
+            statusCode = (int)applicationException.StatusCode;
+            detail = applicationException.Message;
+        }
 
         httpContext.Response.StatusCode = statusCode;
 
@@ -29,31 +36,12 @@ public sealed class GlobalExceptionHandler(
             ProblemDetails = new ProblemDetails
             {
                 Status = statusCode,
-                Title = title,
+                Title = GetProblemTitle(statusCode),
                 Type = GetProblemType(statusCode),
-                Detail = GetSafeErrorMessage(exception, httpContext)
+                Detail = detail
             }
         });
     }
-
-    private static (int StatusCode, string Title) MapException(Exception exception) =>
-        exception switch
-        {
-            Exceptions.ApplicationException appEx =>
-                ((int)appEx.StatusCode, appEx.Message),
-
-            ArgumentNullException =>
-                (StatusCodes.Status400BadRequest, "Invalid argument provided"),
-
-            ArgumentException =>
-                (StatusCodes.Status400BadRequest, "Invalid argument provided"),
-
-            UnauthorizedAccessException =>
-                (StatusCodes.Status401Unauthorized, "Unauthorized"),
-
-            _ =>
-                (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
-        };
 
     private static string GetProblemType(int statusCode) =>
         statusCode switch
@@ -63,22 +51,19 @@ public sealed class GlobalExceptionHandler(
             403 => "https://tools.ietf.org/html/rfc9110#section-15.5.4",
             404 => "https://tools.ietf.org/html/rfc9110#section-15.5.5",
             409 => "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+            422 => "https://tools.ietf.org/html/rfc9110#section-15.5.21",
             _ => "https://tools.ietf.org/html/rfc9110#section-15.6.1"
         };
 
-    private static string? GetSafeErrorMessage(
-        Exception exception,
-        HttpContext context)
-    {
-        var env = context.RequestServices.GetRequiredService<IHostEnvironment>();
-
-        if (env.IsDevelopment())
+    private static string GetProblemTitle(int statusCode) =>
+        statusCode switch
         {
-            return exception.Message;
-        }
-
-        return exception is Exceptions.ApplicationException
-            ? exception.Message
-            : null;
-    }
+            400 => "Bad Request",
+            401 => "Unauthorized",
+            403 => "Forbidden",
+            404 => "Not Found",
+            409 => "Conflict",
+            422 => "Unprocessable Content",
+            _ => "Internal Server Error"
+        };
 }

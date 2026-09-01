@@ -57,6 +57,7 @@ internal sealed class ResourceService(
             Name = request.Name,
             ContentType = request.ContentType,
             ContentLength = request.ContentLength,
+            IsFolder = false,
             CreatedAtUtc = utcNow,
         };
 

@@ -2,10 +2,11 @@
 
 public sealed class Resource : Entity
 {
-    public string Key { get; set; }
+    public string? Key { get; set; }
     public string Name { get; set; }
-    public string ContentType { get; set; }
-    public long ContentLength { get; set; }
+    public string? ContentType { get; set; }
+    public long? ContentLength { get; set; }
+    public bool IsFolder { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }
     public bool IsUploaded { get; set; }

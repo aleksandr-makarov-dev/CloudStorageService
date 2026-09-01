@@ -13,7 +13,6 @@ public class ResourceConfiguration : IEntityTypeConfiguration<Resource>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Key)
-            .IsRequired()
             .HasMaxLength(128);
 
         builder.Property(x => x.Name)
@@ -21,7 +20,6 @@ public class ResourceConfiguration : IEntityTypeConfiguration<Resource>
             .HasMaxLength(128);
 
         builder.Property(x => x.ContentType)
-            .IsRequired()
             .HasMaxLength(32);
     }
 }

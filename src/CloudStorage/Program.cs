@@ -16,16 +16,19 @@ builder.Services.AddApplicationServices();
 builder.Services.AddValidation();
 
 // Api
-builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = ctx =>
     {
-        ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
-        ctx.ProblemDetails.Extensions["timestamp"] = DateTime.UtcNow;
-        ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+        var httpContext = ctx.HttpContext;
+        var problem = ctx.ProblemDetails;
+
+        problem.Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}";
+
+        problem.Extensions["traceId"] = httpContext.TraceIdentifier;
+        problem.Extensions["timestamp"] = DateTimeOffset.UtcNow;
     };
 });
 

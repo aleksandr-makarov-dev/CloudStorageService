@@ -13,6 +13,7 @@ public static class ResourceMappings
             Name = resource.Name,
             ContentType = resource.ContentType,
             ContentLength = resource.ContentLength,
+            IsFolder =  resource.IsFolder,
             CreatedAtUtc = resource.CreatedAtUtc,
             LastModifiedAtUtc = resource.LastModifiedAtUtc
         };

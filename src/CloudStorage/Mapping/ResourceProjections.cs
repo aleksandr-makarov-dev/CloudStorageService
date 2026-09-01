@@ -13,6 +13,7 @@ public static class ResourceProjections
             Name = x.Name,
             ContentType = x.ContentType,
             ContentLength = x.ContentLength,
+            IsFolder =  x.IsFolder,
             CreatedAtUtc = x.CreatedAtUtc,
             LastModifiedAtUtc = x.LastModifiedAtUtc
         };
