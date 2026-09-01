@@ -127,4 +127,20 @@ internal sealed class ResourceService(
 
         return resource.ToResourceResponse();
     }
+
+    public async Task<ResourceResponse> CreateFolderAsync(CreateFolderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var resource = new Resource
+        {
+            Name = request.Name,
+            IsFolder = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        dbContext.Resources.Add(resource);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return resource.ToResourceResponse();
+    }
 }
