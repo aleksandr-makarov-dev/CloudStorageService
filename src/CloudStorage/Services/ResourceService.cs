@@ -74,24 +74,81 @@ internal sealed class ResourceService(
         };
     }
 
-    public async Task<ResourceResponse> CompleteUploadAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ResourceResponse> CompleteUploadAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
     {
-        var resource = await dbContext.Resources.FindByIdAsync(id, cancellationToken);
+        var resource = await dbContext.Resources
+            .Where(x => !x.IsFolder && !x.IsDeleted)
+            .FindByIdAsync(id, cancellationToken);
 
         if (resource is null)
         {
             throw new NotFoundException(nameof(Resource), id);
         }
 
-        // TODO: check if file is fully uploaded.
+        var statObjectArgs = new StatObjectArgs()
+            .WithBucket(_minioOptions.BucketName)
+            .WithObject(resource.Key);
 
-        var utcNow = DateTime.UtcNow;
+        try
+        {
+            var statObject = await minioClient.StatObjectAsync(
+                statObjectArgs,
+                cancellationToken);
 
-        resource.IsUploaded = true;
-        resource.UploadedAtUtc = utcNow;
-        resource.LastModifiedAtUtc = utcNow;
+            if (resource.ContentLength is null)
+            {
+                logger.LogWarning("File resource {ResourceId} does not have a content length.", id);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+                throw new InvalidOperationException(
+                    $"File with id '{id}' does not have a content length.");
+            }
+
+            if (statObject.Size != resource.ContentLength.Value)
+            {
+                logger.LogWarning(
+                    "File {ResourceId} size mismatch. Expected {ExpectedSize}, actual {ActualSize}.",
+                    id,
+                    resource.ContentLength.Value,
+                    statObject.Size);
+
+                throw new ConflictException(
+                    $"File with id '{id}' was not fully uploaded.");
+            }
+
+            if (!string.Equals(
+                    statObject.ContentType,
+                    resource.ContentType,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogWarning(
+                    "File {ResourceId} content type mismatch. Expected {ExpectedContentType}, actual {ActualContentType}.",
+                    id,
+                    resource.ContentType,
+                    statObject.ContentType);
+
+                throw new ConflictException(
+                    $"File with id '{id}' has an invalid content type.");
+            }
+
+            var utcNow = DateTime.UtcNow;
+
+            resource.IsUploaded = true;
+            resource.UploadedAtUtc = utcNow;
+            resource.LastModifiedAtUtc = utcNow;
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Minio.Exceptions.ObjectNotFoundException exception)
+        {
+            logger.LogWarning(
+                exception,
+                "Could not find resource with key {ResourceKey} in object storage.",
+                resource.Key);
+
+            throw new ConflictException($"File with id '{id}' was not uploaded.", exception);
+        }
 
         return resource.ToResourceResponse();
     }
@@ -142,5 +199,21 @@ internal sealed class ResourceService(
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return resource.ToResourceResponse();
+    }
+
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var resource = await dbContext.Resources.FindByIdAsync(id, cancellationToken);
+
+        if (resource is null)
+        {
+            throw new NotFoundException(nameof(Resource), id);
+        }
+
+        // TODO: mark for deletion or clean up s3 object
+
+        dbContext.Resources.Remove(resource);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

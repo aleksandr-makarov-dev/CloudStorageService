@@ -60,4 +60,12 @@ public class ResourceController(IResourceService resourceService) : ControllerBa
 
         return Ok(result);
     }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteResource(Guid id, CancellationToken cancellationToken = default)
+    {
+        await resourceService.DeleteAsync(id, cancellationToken);
+        
+        return NoContent();
+    }
 }

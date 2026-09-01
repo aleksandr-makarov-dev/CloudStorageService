@@ -18,4 +18,6 @@ public interface IResourceService
 
     Task<ResourceResponse> CreateFolderAsync(CreateFolderRequest request,
         CancellationToken cancellationToken = default);
+
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
