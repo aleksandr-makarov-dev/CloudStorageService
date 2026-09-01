@@ -229,7 +229,18 @@ internal sealed class ResourceService(
             throw new NotFoundException(nameof(Resource), id);
         }
 
-        // TODO: mark for deletion or clean up s3 object
+        // TODO: child folder and files are not deleted.
+        
+        if (!resource.IsFolder)
+        {
+            var removeObjectArgs = new RemoveObjectArgs()
+                .WithBucket(_minioOptions.BucketName)
+                .WithObject(resource.Key);
+
+            await minioClient.RemoveObjectAsync(
+                removeObjectArgs,
+                cancellationToken); 
+        }
 
         dbContext.Resources.Remove(resource);
 
