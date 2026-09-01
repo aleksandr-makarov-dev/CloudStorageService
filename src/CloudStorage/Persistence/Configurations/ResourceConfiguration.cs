@@ -21,5 +21,10 @@ public class ResourceConfiguration : IEntityTypeConfiguration<Resource>
 
         builder.Property(x => x.ContentType)
             .HasMaxLength(32);
+
+        builder.HasOne(x => x.Parent)
+            .WithMany(x => x.Children)
+            .HasForeignKey(x => x.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
