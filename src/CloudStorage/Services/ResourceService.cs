@@ -102,7 +102,7 @@ internal sealed class ResourceService(
         return await dbContext.Resources
             .AsNoTracking()
             // TODO: replace with global filter for soft delete
-            .Where(x => x.IsUploaded && !x.IsDeleted)
+            .Where(x => (x.IsFolder || x.IsUploaded) && !x.IsDeleted)
             .OrderByDescending(x => x.CreatedAtUtc)
             .Select(ResourceProjections.ToResourceResponse)
             .ToListAsync(cancellationToken);
