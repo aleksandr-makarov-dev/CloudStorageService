@@ -13,6 +13,7 @@ internal sealed class ListResourcesHandler(IApplicationDbContext dbContext)
     {
         var resources = await dbContext.Resources
             .Where(x => (x.IsFolder || x.IsUploaded) && !x.IsDeleted && x.ParentId == request.ParentId)
+            .OrderByDescending(x => x.CreatedAtUtc)
             .Select(ResourceProjections.ToResourceResponse)
             .ToListAsync(cancellationToken);
 
