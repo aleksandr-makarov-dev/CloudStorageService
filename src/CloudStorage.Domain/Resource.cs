@@ -72,4 +72,16 @@ public sealed class Resource : Entity
         UploadedAtUtc = utcNow;
         LastModifiedAtUtc = utcNow;
     }
+
+    public void MarkDeleted()
+    {
+        IsDeleted = true;
+        DeletedAtUtc = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        IsDeleted = false;
+        DeletedAtUtc = null;
+    }
 }

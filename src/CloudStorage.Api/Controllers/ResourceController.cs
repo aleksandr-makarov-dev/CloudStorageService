@@ -5,6 +5,7 @@ using CloudStorage.Application.Resources.CreateFolder;
 using CloudStorage.Application.Resources.CreateUploadUrl;
 using CloudStorage.Application.Resources.ListResources;
 using CloudStorage.Application.Resources.UpdateResource;
+using CommunityToolkit.HighPerformance.Helpers;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,16 +42,7 @@ public class ResourceController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(command, cancellationToken);
         return Ok(result);
     }
-
-    [HttpPut("{id:guid}/complete-upload")]
-    public async Task<IActionResult> CompleteUpload(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        await mediator.Send(new CompleteUploadCommand(id), cancellationToken);
-        return NoContent();
-    }
-
+    
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateResource(
         Guid id,
@@ -61,5 +53,38 @@ public class ResourceController(IMediator mediator) : ControllerBase
             await mediator.Send(new UpdateResourceCommand(id, request.Name),
                 cancellationToken);
         return Ok(result);
+    }
+
+    [HttpPut("{id:guid}/complete-upload")]
+    public async Task<IActionResult> CompleteUpload(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        await mediator.Send(new CompleteUploadCommand(id), cancellationToken);
+        return NoContent();
+    }
+    
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteResource(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Method not implemented.");
+    }
+    
+    [HttpPost("{id:guid}/restore")]
+    public async Task<IActionResult> RestoreResource(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Method not implemented.");
+    }
+
+    [HttpGet("trash")]
+    public async Task<IActionResult> GetTrash(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Method not implemented.");
+    }
+
+    [HttpDelete("trash")]
+    public async Task<IActionResult> EmptyTrash(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Method not implemented.");
     }
 }
