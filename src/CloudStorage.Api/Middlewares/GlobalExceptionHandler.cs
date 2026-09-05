@@ -13,7 +13,6 @@ public sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
-        // TODO: refactor exception handling
         logger.LogError(
             exception,
             "Unhandled exception occurred. TraceId: {TraceId}",
@@ -52,7 +51,6 @@ public sealed class GlobalExceptionHandler(
             403 => "https://tools.ietf.org/html/rfc9110#section-15.5.4",
             404 => "https://tools.ietf.org/html/rfc9110#section-15.5.5",
             409 => "https://tools.ietf.org/html/rfc9110#section-15.5.10",
-            422 => "https://tools.ietf.org/html/rfc9110#section-15.5.21",
             _ => "https://tools.ietf.org/html/rfc9110#section-15.6.1"
         };
 
@@ -64,7 +62,6 @@ public sealed class GlobalExceptionHandler(
             403 => "Forbidden",
             404 => "Not Found",
             409 => "Conflict",
-            422 => "Unprocessable Content",
             _ => "Internal Server Error"
         };
 }
