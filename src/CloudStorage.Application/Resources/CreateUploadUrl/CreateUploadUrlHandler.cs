@@ -1,9 +1,9 @@
 ﻿using CloudStorage.Application.Common;
 using CloudStorage.Application.Common.Exceptions;
-using CloudStorage.Application.Common.Extensions;
 using CloudStorage.Application.Common.Interfaces;
 using CloudStorage.Domain;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CloudStorage.Application.Resources.CreateUploadUrl;
@@ -17,9 +17,9 @@ internal sealed class CreateUploadUrlHandler(
     public async ValueTask<CreateUploadUrlResponse> Handle(CreateUploadUrlCommand command,
         CancellationToken cancellationToken)
     {
-        // Check if parent folder exists and not marked for deletion
         if (command.ParentId.HasValue &&
-            !await dbContext.Resources.FolderExistsAsync(command.ParentId.Value, cancellationToken))
+            !await dbContext.Resources.AnyAsync(x =>
+                x.ParentId == command.ParentId && x.IsFolder, cancellationToken))
         {
             logger.LogWarning("Parent folder not found. ParentFolderId: {ParentFolderId}", command.ParentId.Value);
 

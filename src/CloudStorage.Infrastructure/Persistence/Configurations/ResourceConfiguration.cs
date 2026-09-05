@@ -1,4 +1,5 @@
-﻿using CloudStorage.Domain;
+﻿using CloudStorage.Application.Common;
+using CloudStorage.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -31,6 +32,6 @@ public class ResourceConfiguration : IEntityTypeConfiguration<Resource>
 
         builder.HasIndex(x => x.IsDeleted);
 
-        builder.HasQueryFilter(NamedQueries.SoftDelete, x => !x.IsDeleted);
+        builder.HasQueryFilter(QueryFilters.SoftDelete, x => !x.IsDeleted);
     }
 }

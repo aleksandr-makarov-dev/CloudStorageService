@@ -1,10 +1,10 @@
 ﻿using CloudStorage.Application.Common.Exceptions;
-using CloudStorage.Application.Common.Extensions;
 using CloudStorage.Application.Common.Interfaces;
 using CloudStorage.Application.Common.Mappings;
 using CloudStorage.Application.Resources.ListResources;
 using CloudStorage.Domain;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CloudStorage.Application.Resources.CreateFolder;
@@ -14,9 +14,9 @@ internal sealed class CreateFolderHandler(IApplicationDbContext dbContext, ILogg
 {
     public async ValueTask<ResourceResponse> Handle(CreateFolderCommand command, CancellationToken cancellationToken)
     {
-        // Check if parent folder exists and not marked for deletion
         if (command.ParentId.HasValue &&
-            !await dbContext.Resources.FolderExistsAsync(command.ParentId.Value, cancellationToken))
+            !await dbContext.Resources.AnyAsync(x =>
+                x.ParentId == command.ParentId && x.IsFolder, cancellationToken))
         {
             logger.LogWarning("Parent folder not found. ParentFolderId: {ParentFolderId}", command.ParentId.Value);
 

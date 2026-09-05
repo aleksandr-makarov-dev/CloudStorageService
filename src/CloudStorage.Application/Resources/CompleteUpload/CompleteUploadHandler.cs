@@ -1,8 +1,8 @@
 ﻿using CloudStorage.Application.Common.Exceptions;
-using CloudStorage.Application.Common.Extensions;
 using CloudStorage.Application.Common.Interfaces;
 using CloudStorage.Domain;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CloudStorage.Application.Resources.CompleteUpload;
@@ -14,7 +14,8 @@ internal sealed class CompleteUploadHandler(
 {
     public async ValueTask<Unit> Handle(CompleteUploadCommand command, CancellationToken cancellationToken)
     {
-        var file = await dbContext.Resources.FindFileByIdAsync(command.Id, cancellationToken);
+        var file = await dbContext.Resources.FirstOrDefaultAsync(x => x.Id == command.Id && !x.IsFolder,
+            cancellationToken);
 
         if (file is null)
         {
