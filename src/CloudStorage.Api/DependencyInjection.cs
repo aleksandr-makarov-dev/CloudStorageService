@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using CloudStorage.Api.Middlewares;
 using CloudStorage.Api.Options;
 using CloudStorage.Infrastructure.Storage;
 
@@ -8,6 +9,9 @@ public static class DependencyInjection
 {
     public static void AddApiLayer(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddExceptionHandler<ValidationExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+
         services.AddCors(configuration);
         services.AddProblemDetails();
         services.AddApiVersioning();
