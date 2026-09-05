@@ -12,7 +12,7 @@ internal sealed class ListResourcesHandler(IApplicationDbContext dbContext)
         CancellationToken cancellationToken)
     {
         var resources = await dbContext.Resources
-            .Where(x => (x.IsFolder || x.IsUploaded) && !x.IsDeleted && x.ParentId == request.ParentId)
+            .Where(x => (x.IsFolder || x.IsUploaded) && x.ParentId == request.ParentId)
             .OrderByDescending(x => x.CreatedAtUtc)
             .Select(ResourceProjections.ToResourceResponse)
             .ToListAsync(cancellationToken);

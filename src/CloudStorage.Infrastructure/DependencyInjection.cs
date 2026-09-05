@@ -12,8 +12,13 @@ public static class DependencyInjection
 {
     public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddScoped<SoftDeleteInterceptor>();
+
+        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+        {
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            options.AddInterceptors(serviceProvider.GetRequiredService<SoftDeleteInterceptor>());
+        });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
@@ -38,7 +43,7 @@ public static class DependencyInjection
             .Build());
 
         services.AddScoped<IFileStorage, MinioFileStorage>();
-        
+
         services.AddHostedService<MinioStartupHostedService>();
     }
 }

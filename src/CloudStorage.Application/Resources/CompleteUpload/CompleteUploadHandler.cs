@@ -48,7 +48,7 @@ internal sealed class CompleteUploadHandler(
             throw new ConflictException($"Uploaded file with id '{file.Id}' has an invalid content type.");
         }
 
-        file.MarkUploaded();
+        file.MarkUploaded(DateTime.UtcNow);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

@@ -26,5 +26,11 @@ public class ResourceConfiguration : IEntityTypeConfiguration<Resource>
             .WithMany(x => x.Children)
             .HasForeignKey(x => x.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.Key).IsUnique();
+
+        builder.HasIndex(x => x.IsDeleted);
+
+        builder.HasQueryFilter(NamedQueries.SoftDelete, x => !x.IsDeleted);
     }
 }

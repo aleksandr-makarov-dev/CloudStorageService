@@ -1,6 +1,6 @@
 ﻿namespace CloudStorage.Domain;
 
-public sealed class Resource : Entity
+public sealed class Resource : Entity, ISoftDeletable
 {
     public string? Key { get; private set; }
     public string Name { get; private set; }
@@ -64,19 +64,17 @@ public sealed class Resource : Entity
         LastModifiedAtUtc = DateTime.UtcNow;
     }
 
-    public void MarkUploaded()
+    public void MarkUploaded(DateTime uploadedAtUtc)
     {
-        var utcNow = DateTime.UtcNow;
-
         IsUploaded = true;
-        UploadedAtUtc = utcNow;
-        LastModifiedAtUtc = utcNow;
+        UploadedAtUtc = uploadedAtUtc;
+        LastModifiedAtUtc = uploadedAtUtc;
     }
 
-    public void MarkDeleted()
+    public void MarkDeleted(DateTime deletedAtUtc)
     {
         IsDeleted = true;
-        DeletedAtUtc = DateTime.UtcNow;
+        DeletedAtUtc = deletedAtUtc;
     }
 
     public void Restore()
