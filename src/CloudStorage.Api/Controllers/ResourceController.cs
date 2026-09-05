@@ -4,6 +4,7 @@ using CloudStorage.Application.Resources.CompleteUpload;
 using CloudStorage.Application.Resources.CreateFolder;
 using CloudStorage.Application.Resources.CreateUploadUrl;
 using CloudStorage.Application.Resources.ListResources;
+using CloudStorage.Application.Resources.ListTrash;
 using CloudStorage.Application.Resources.RestoreResource;
 using CloudStorage.Application.Resources.SoftDeleteResource;
 using CloudStorage.Application.Resources.UpdateResource;
@@ -81,9 +82,10 @@ public class ResourceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("trash")]
-    public async Task<IActionResult> GetTrash(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ListTrash(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException("Method not implemented.");
+        var resources = await mediator.Send(new ListTrashQuery(), cancellationToken);
+        return Ok(resources);
     }
 
     [HttpDelete("trash")]
