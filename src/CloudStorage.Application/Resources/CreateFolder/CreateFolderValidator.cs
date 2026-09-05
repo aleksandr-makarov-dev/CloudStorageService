@@ -2,7 +2,7 @@
 
 namespace CloudStorage.Application.Resources.CreateFolder;
 
-internal sealed class CreateFolderValidator : AbstractValidator<CreateFolderRequest>
+internal sealed class CreateFolderValidator : AbstractValidator<CreateFolderCommand>
 {
     public CreateFolderValidator()
     {

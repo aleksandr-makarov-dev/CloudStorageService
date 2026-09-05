@@ -4,4 +4,4 @@ using Mediator;
 
 namespace CloudStorage.Application.Resources.CreateFolder;
 
-public record CreateFolderRequest(string Name, Guid? ParentId = null) : IRequest<ResourceResponse>;
+public record CreateFolderCommand(string Name, Guid? ParentId = null) : IRequest<ResourceResponse>;

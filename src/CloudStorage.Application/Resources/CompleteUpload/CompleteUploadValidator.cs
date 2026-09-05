@@ -2,7 +2,7 @@
 
 namespace CloudStorage.Application.Resources.CompleteUpload;
 
-internal sealed class CompleteUploadValidator : AbstractValidator<CompleteUploadRequest>
+internal sealed class CompleteUploadValidator : AbstractValidator<CompleteUploadCommand>
 {
     public CompleteUploadValidator()
     {

@@ -4,6 +4,7 @@ using CloudStorage.Application.Resources.CompleteUpload;
 using CloudStorage.Application.Resources.CreateFolder;
 using CloudStorage.Application.Resources.CreateUploadUrl;
 using CloudStorage.Application.Resources.ListResources;
+using CloudStorage.Application.Resources.UpdateResource;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,19 +26,19 @@ public class ResourceController(IMediator mediator) : ControllerBase
 
     [HttpPost("folder")]
     public async Task<IActionResult> CreateFolder(
-        [FromBody] CreateFolderRequest request,
+        [FromBody] CreateFolderCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await mediator.Send(request, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         return Ok(result);
     }
 
     [HttpPost("upload-url")]
     public async Task<IActionResult> CreateUploadUrl(
-        [FromBody] CreateUploadUrlRequest request,
+        [FromBody] CreateUploadUrlCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await mediator.Send(request, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         return Ok(result);
     }
 
@@ -46,7 +47,7 @@ public class ResourceController(IMediator mediator) : ControllerBase
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        await mediator.Send(new CompleteUploadRequest(id), cancellationToken);
+        await mediator.Send(new CompleteUploadCommand(id), cancellationToken);
         return NoContent();
     }
 
@@ -57,7 +58,7 @@ public class ResourceController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var result =
-            await mediator.Send(new Application.Resources.UpdateResource.UpdateResourceRequest(id, request.Name),
+            await mediator.Send(new UpdateResourceCommand(id, request.Name),
                 cancellationToken);
         return Ok(result);
     }

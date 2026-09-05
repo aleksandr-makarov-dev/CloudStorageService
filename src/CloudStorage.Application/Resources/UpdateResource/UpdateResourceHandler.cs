@@ -10,19 +10,19 @@ using Microsoft.Extensions.Logging;
 namespace CloudStorage.Application.Resources.UpdateResource;
 
 internal sealed class UpdateResourceHandler(IApplicationDbContext dbContext, ILogger<UpdateResourceHandler> logger)
-    : IRequestHandler<UpdateResourceRequest, ResourceResponse>
+    : IRequestHandler<UpdateResourceCommand, ResourceResponse>
 {
-    public async ValueTask<ResourceResponse> Handle(UpdateResourceRequest request, CancellationToken cancellationToken)
+    public async ValueTask<ResourceResponse> Handle(UpdateResourceCommand command, CancellationToken cancellationToken)
     {
-        var file = await dbContext.Resources.FindFileByIdAsync(request.Id, cancellationToken);
+        var file = await dbContext.Resources.FindFileByIdAsync(command.Id, cancellationToken);
 
         if (file is null)
         {
-            logger.LogWarning("Could not find resource with id {ResourceId}.", request.Id);
-            throw new NotFoundException(nameof(Resource), request.Id);
+            logger.LogWarning("Could not find resource with id {ResourceId}.", command.Id);
+            throw new NotFoundException(nameof(Resource), command.Id);
         }
 
-        file.Rename(request.Name);
+        file.Rename(command.Name);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return file.ToResourceResponse();

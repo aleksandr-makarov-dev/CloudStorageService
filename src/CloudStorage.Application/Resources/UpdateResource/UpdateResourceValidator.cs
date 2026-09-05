@@ -2,7 +2,7 @@
 
 namespace CloudStorage.Application.Resources.UpdateResource;
 
-internal sealed class UpdateResourceValidator : AbstractValidator<UpdateResourceRequest>
+internal sealed class UpdateResourceValidator : AbstractValidator<UpdateResourceCommand>
 {
     public UpdateResourceValidator()
     {

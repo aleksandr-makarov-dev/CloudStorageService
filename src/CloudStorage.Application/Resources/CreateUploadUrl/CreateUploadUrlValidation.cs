@@ -2,7 +2,7 @@
 
 namespace CloudStorage.Application.Resources.CreateUploadUrl;
 
-internal sealed class CreateUploadUrlValidation : AbstractValidator<CreateUploadUrlRequest>
+internal sealed class CreateUploadUrlValidation : AbstractValidator<CreateUploadUrlCommand>
 {
     public CreateUploadUrlValidation()
     {

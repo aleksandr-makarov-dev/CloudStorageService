@@ -3,4 +3,4 @@ using Mediator;
 
 namespace CloudStorage.Application.Resources.CompleteUpload;
 
-public sealed record CompleteUploadRequest(Guid Id) : IRequest;
+public sealed record CompleteUploadCommand(Guid Id) : IRequest;

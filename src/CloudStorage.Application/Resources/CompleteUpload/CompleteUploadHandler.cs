@@ -10,16 +10,16 @@ namespace CloudStorage.Application.Resources.CompleteUpload;
 internal sealed class CompleteUploadHandler(
     IApplicationDbContext dbContext,
     IFileStorage fileStorage,
-    ILogger<CompleteUploadHandler> logger) : IRequestHandler<CompleteUploadRequest>
+    ILogger<CompleteUploadHandler> logger) : IRequestHandler<CompleteUploadCommand>
 {
-    public async ValueTask<Unit> Handle(CompleteUploadRequest request, CancellationToken cancellationToken)
+    public async ValueTask<Unit> Handle(CompleteUploadCommand command, CancellationToken cancellationToken)
     {
-        var file = await dbContext.Resources.FindFileByIdAsync(request.Id, cancellationToken);
+        var file = await dbContext.Resources.FindFileByIdAsync(command.Id, cancellationToken);
 
         if (file is null)
         {
-            logger.LogWarning("Could not find resource with id {ResourceId}.", request.Id);
-            throw new NotFoundException(nameof(Resource), request.Id);
+            logger.LogWarning("Could not find resource with id {ResourceId}.", command.Id);
+            throw new NotFoundException(nameof(Resource), command.Id);
         }
 
         var objectInfo = await fileStorage.GetObjectInfoAsync(file.Key, cancellationToken);

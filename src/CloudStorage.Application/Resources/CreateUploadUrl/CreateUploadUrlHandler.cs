@@ -12,18 +12,18 @@ internal sealed class CreateUploadUrlHandler(
     IApplicationDbContext dbContext,
     IFileStorage fileStorage,
     ILogger<CreateUploadUrlHandler> logger)
-    : IRequestHandler<CreateUploadUrlRequest, CreateUploadUrlResponse>
+    : IRequestHandler<CreateUploadUrlCommand, CreateUploadUrlResponse>
 {
-    public async ValueTask<CreateUploadUrlResponse> Handle(CreateUploadUrlRequest request,
+    public async ValueTask<CreateUploadUrlResponse> Handle(CreateUploadUrlCommand command,
         CancellationToken cancellationToken)
     {
         // Check if parent folder exists and not marked for deletion
-        if (request.ParentId.HasValue &&
-            !await dbContext.Resources.FolderExistsAsync(request.ParentId.Value, cancellationToken))
+        if (command.ParentId.HasValue &&
+            !await dbContext.Resources.FolderExistsAsync(command.ParentId.Value, cancellationToken))
         {
-            logger.LogWarning("Parent folder not found. ParentFolderId: {ParentFolderId}", request.ParentId.Value);
+            logger.LogWarning("Parent folder not found. ParentFolderId: {ParentFolderId}", command.ParentId.Value);
 
-            throw new ConflictException($"Parent folder with id '{request.ParentId.Value}' does not exist.");
+            throw new ConflictException($"Parent folder with id '{command.ParentId.Value}' does not exist.");
         }
 
 
@@ -32,16 +32,16 @@ internal sealed class CreateUploadUrlHandler(
         var objectId = Guid.NewGuid();
         var objectKey = StorageKeyBuilder.Build(objectId, utcNow);
 
-        var uploadUrl = await fileStorage.GetUploadUrlAsync(objectKey, request.ContentType, request.ContentLength,
+        var uploadUrl = await fileStorage.GetUploadUrlAsync(objectKey, command.ContentType, command.ContentLength,
             cancellationToken);
 
         var file = Resource.File(
             objectId,
             objectKey,
-            request.Name,
-            request.ContentType,
-            request.ContentLength,
-            request.ParentId
+            command.Name,
+            command.ContentType,
+            command.ContentLength,
+            command.ParentId
         );
 
         dbContext.Resources.Add(file);

@@ -3,4 +3,4 @@ using Mediator;
 
 namespace CloudStorage.Application.Resources.UpdateResource;
 
-public sealed record UpdateResourceRequest(Guid Id, string Name) : IRequest<ResourceResponse>;
+public sealed record UpdateResourceCommand(Guid Id, string Name) : IRequest<ResourceResponse>;
