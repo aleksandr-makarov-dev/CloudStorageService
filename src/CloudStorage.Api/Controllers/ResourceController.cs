@@ -4,6 +4,7 @@ using CloudStorage.Application.Resources.CompleteUpload;
 using CloudStorage.Application.Resources.CreateFolder;
 using CloudStorage.Application.Resources.CreateUploadUrl;
 using CloudStorage.Application.Resources.ListResources;
+using CloudStorage.Application.Resources.RestoreResource;
 using CloudStorage.Application.Resources.SoftDeleteResource;
 using CloudStorage.Application.Resources.UpdateResource;
 using CommunityToolkit.HighPerformance.Helpers;
@@ -75,7 +76,8 @@ public class ResourceController(IMediator mediator) : ControllerBase
     [HttpPost("{id:guid}/restore")]
     public async Task<IActionResult> RestoreResource(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException("Method not implemented.");
+        await mediator.Send(new RestoreResourceCommand(id), cancellationToken);
+        return NoContent();
     }
 
     [HttpGet("trash")]
