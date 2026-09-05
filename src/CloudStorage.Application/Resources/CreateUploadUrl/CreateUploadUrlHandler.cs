@@ -19,7 +19,7 @@ internal sealed class CreateUploadUrlHandler(
     {
         if (command.ParentId.HasValue &&
             !await dbContext.Resources.AnyAsync(x =>
-                x.ParentId == command.ParentId && x.IsFolder, cancellationToken))
+                x.Id == command.ParentId && x.IsFolder, cancellationToken))
         {
             logger.LogWarning("Parent folder not found. ParentFolderId: {ParentFolderId}", command.ParentId.Value);
 
