@@ -55,4 +55,32 @@ public class MinioFileStorage(
 
         return new UploadUrl(uri.ToString(), expiresAtUtc, formFields.ToDictionary());
     }
+
+    public async Task<DownloadUrl> GetDownloadUrlAsync(string key, string name, string contentType,
+        CancellationToken cancellationToken = default)
+    {
+        var ttl = TimeSpan.FromMinutes(storageOptions.Value.DownloadUrlTtlMinutes);
+        var expiresAtUtc = DateTime.UtcNow.Add(ttl);
+        
+        var contentDisposition =
+            $"attachment; filename=\"{name}\"; filename*=UTF-8''{Uri.EscapeDataString(name)}";
+
+        var headers = new Dictionary<string, string>
+        {
+            ["response-content-type"] = contentType,
+            ["response-content-disposition"] = contentDisposition,
+        };
+
+        var args = new PresignedGetObjectArgs()
+            .WithBucket(minioOptions.Value.BucketName)
+            .WithObject(key)
+            .WithExpiry((int)ttl.TotalSeconds)
+            .WithHeaders(headers);
+
+        var url = await minioClient
+            .PresignedGetObjectAsync(args)
+            .ConfigureAwait(false);
+
+        return new DownloadUrl(url, expiresAtUtc);
+    }
 }

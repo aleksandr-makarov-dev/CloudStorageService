@@ -3,6 +3,7 @@ using CloudStorage.Api.Models;
 using CloudStorage.Application.Resources.CompleteUpload;
 using CloudStorage.Application.Resources.CreateFolder;
 using CloudStorage.Application.Resources.CreateUploadUrl;
+using CloudStorage.Application.Resources.GetDownloadUrl;
 using CloudStorage.Application.Resources.ListResources;
 using CloudStorage.Application.Resources.ListTrash;
 using CloudStorage.Application.Resources.RestoreResource;
@@ -43,6 +44,15 @@ public class ResourceController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{id:guid}/download-url")]
+    public async Task<IActionResult> GetDownloadUrl(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new GetDownloadUrlQuery(id), cancellationToken);
         return Ok(result);
     }
 
