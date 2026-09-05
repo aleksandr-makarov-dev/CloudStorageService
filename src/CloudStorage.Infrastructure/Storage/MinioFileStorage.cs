@@ -59,9 +59,9 @@ public class MinioFileStorage(
     public async Task<DownloadUrl> GetDownloadUrlAsync(string key, string name, string contentType,
         CancellationToken cancellationToken = default)
     {
-        var ttl = TimeSpan.FromMinutes(storageOptions.Value.DownloadUrlTtlMinutes);
-        var expiresAtUtc = DateTime.UtcNow.Add(ttl);
-        
+        var downloadUrlTtlSeconds = storageOptions.Value.DownloadUrlTtlMinutes * 60;
+        var expiresAtUtc = DateTime.UtcNow.AddSeconds(downloadUrlTtlSeconds);
+
         var contentDisposition =
             $"attachment; filename=\"{name}\"; filename*=UTF-8''{Uri.EscapeDataString(name)}";
 
@@ -74,7 +74,7 @@ public class MinioFileStorage(
         var args = new PresignedGetObjectArgs()
             .WithBucket(minioOptions.Value.BucketName)
             .WithObject(key)
-            .WithExpiry((int)ttl.TotalSeconds)
+            .WithExpiry(downloadUrlTtlSeconds)
             .WithHeaders(headers);
 
         var url = await minioClient
