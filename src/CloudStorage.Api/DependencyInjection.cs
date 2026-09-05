@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
-using CloudStorage.Api.HostedServices;
 using CloudStorage.Api.Options;
+using CloudStorage.Infrastructure.Storage;
 
 namespace CloudStorage.Api;
 
@@ -8,7 +8,6 @@ public static class DependencyInjection
 {
     public static void AddApiLayer(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHostedServices();
         services.AddCors(configuration);
         services.AddProblemDetails();
         services.AddApiVersioning();
@@ -67,10 +66,5 @@ public static class DependencyInjection
                 options.GroupNameFormat = "'v'VVV";
                 options.SubstituteApiVersionInUrl = true;
             });
-    }
-
-    private static void AddHostedServices(this IServiceCollection services)
-    {
-        services.AddHostedService<MinioStartupHostedService>();
     }
 }

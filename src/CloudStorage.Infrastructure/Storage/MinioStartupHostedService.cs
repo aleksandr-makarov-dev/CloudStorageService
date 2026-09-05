@@ -1,9 +1,10 @@
-﻿using CloudStorage.Infrastructure.Storage;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 
-namespace CloudStorage.Api.HostedServices;
+namespace CloudStorage.Infrastructure.Storage;
 
 public sealed class MinioStartupHostedService(
     IMinioClient minioClient,

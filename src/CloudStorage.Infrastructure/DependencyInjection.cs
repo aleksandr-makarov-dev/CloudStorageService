@@ -38,5 +38,7 @@ public static class DependencyInjection
             .Build());
 
         services.AddScoped<IFileStorage, MinioFileStorage>();
+        
+        services.AddHostedService<MinioStartupHostedService>();
     }
 }
