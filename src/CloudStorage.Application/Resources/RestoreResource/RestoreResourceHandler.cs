@@ -15,7 +15,7 @@ internal sealed class RestoreResourceHandler(IApplicationDbContext dbContext, IL
     {
         var resource = await dbContext.Resources
             .IgnoreQueryFilters([QueryFilters.SoftDelete])
-            .FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == command.Id && x.IsDeleted, cancellationToken);
 
         if (resource is null)
         {
