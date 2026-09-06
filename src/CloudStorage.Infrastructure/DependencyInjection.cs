@@ -1,4 +1,5 @@
 ﻿using CloudStorage.Application.Common.Interfaces;
+using CloudStorage.Application.Common.Options;
 using CloudStorage.Infrastructure.Persistence;
 using CloudStorage.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;

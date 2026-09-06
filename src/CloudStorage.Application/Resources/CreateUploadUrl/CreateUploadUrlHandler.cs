@@ -1,16 +1,19 @@
 ﻿using CloudStorage.Application.Common;
 using CloudStorage.Application.Common.Exceptions;
 using CloudStorage.Application.Common.Interfaces;
+using CloudStorage.Application.Common.Options;
 using CloudStorage.Domain;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CloudStorage.Application.Resources.CreateUploadUrl;
 
 internal sealed class CreateUploadUrlHandler(
     IApplicationDbContext dbContext,
     IFileStorage fileStorage,
+    IOptions<StorageOptions> storageOptions,
     ILogger<CreateUploadUrlHandler> logger)
     : IRequestHandler<CreateUploadUrlCommand, CreateUploadUrlResponse>
 {
@@ -32,8 +35,9 @@ internal sealed class CreateUploadUrlHandler(
         var objectId = Guid.NewGuid();
         var objectKey = StorageKeyBuilder.Build(objectId, utcNow);
 
+        var timeToLive = storageOptions.Value.UploadUrlTtl;
         var uploadUrl = await fileStorage.GetUploadUrlAsync(objectKey, command.ContentType, command.ContentLength,
-            cancellationToken);
+            timeToLive, cancellationToken);
 
         var file = Resource.File(
             objectId,

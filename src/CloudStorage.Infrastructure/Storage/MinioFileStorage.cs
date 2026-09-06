@@ -11,7 +11,6 @@ namespace CloudStorage.Infrastructure.Storage;
 public class MinioFileStorage(
     IMinioClient minioClient,
     IOptions<MinioOptions> minioOptions,
-    IOptions<StorageOptions> storageOptions,
     ILogger<MinioFileStorage> logger) : IFileStorage
 {
     public async Task<ObjectInfo?> GetObjectInfoAsync(string objectName, CancellationToken cancellationToken = default)
@@ -34,9 +33,9 @@ public class MinioFileStorage(
     }
 
     public async Task<UploadUrl> GetUploadUrlAsync(string objectName, string contentType, long contentLength,
-        CancellationToken cancellationToken = default)
+        TimeSpan timeToLive, CancellationToken cancellationToken = default)
     {
-        var expiresAtUtc = DateTime.UtcNow.AddMinutes(storageOptions.Value.UploadUrlTtlMinutes);
+        var expiresAtUtc = DateTime.UtcNow.Add(timeToLive);
 
         var policy = new PostPolicy();
         policy.SetKey(objectName);
@@ -56,11 +55,10 @@ public class MinioFileStorage(
         return new UploadUrl(uri.ToString(), expiresAtUtc, formFields.ToDictionary());
     }
 
-    public async Task<DownloadUrl> GetDownloadUrlAsync(string key, string name, string contentType,
-        CancellationToken cancellationToken = default)
+    public async Task<DownloadUrl> GetDownloadUrlAsync(string objectName, string name, string contentType,
+        TimeSpan timeToLive, CancellationToken cancellationToken = default)
     {
-        var downloadUrlTtlSeconds = storageOptions.Value.DownloadUrlTtlMinutes * 60;
-        var expiresAtUtc = DateTime.UtcNow.AddSeconds(downloadUrlTtlSeconds);
+        var expiresAtUtc = DateTime.UtcNow.Add(timeToLive);
 
         var contentDisposition =
             $"attachment; filename=\"{name}\"; filename*=UTF-8''{Uri.EscapeDataString(name)}";
@@ -73,14 +71,25 @@ public class MinioFileStorage(
 
         var args = new PresignedGetObjectArgs()
             .WithBucket(minioOptions.Value.BucketName)
-            .WithObject(key)
-            .WithExpiry(downloadUrlTtlSeconds)
+            .WithObject(objectName)
+            .WithExpiry(timeToLive.Seconds)
             .WithHeaders(headers);
 
         var url = await minioClient
-            .PresignedGetObjectAsync(args)
-            .ConfigureAwait(false);
+            .PresignedGetObjectAsync(args);
 
         return new DownloadUrl(url, expiresAtUtc);
+    }
+
+    public async Task<IEnumerable<RemoveObjectError>> RemoveObjectsAsync(List<string> objectNames,
+        CancellationToken cancellationToken = default)
+    {
+        var removeObjectsArgs = new RemoveObjectsArgs()
+            .WithBucket(minioOptions.Value.BucketName)
+            .WithObjects(objectNames);
+
+        var errors = await minioClient.RemoveObjectsAsync(removeObjectsArgs, cancellationToken);
+
+        return errors.Select(x => new RemoveObjectError(x.Key, x.Code, x.Message));
     }
 }

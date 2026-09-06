@@ -22,6 +22,12 @@ internal sealed class SoftDeleteResourceHandler(
             throw new NotFoundException(nameof(Resource), command.Id);
         }
 
+        // TODO: Support delete functionality for folders.
+        if (resource.IsFolder)
+        {
+            throw new NotImplementedException("Method not implemented");
+        }
+
         dbContext.Resources.Remove(resource);
         await dbContext.SaveChangesAsync(cancellationToken);
 
